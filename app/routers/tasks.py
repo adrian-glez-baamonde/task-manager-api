@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from datetime import datetime
-from app.schemas import TaskCreate
+from app.schemas import TaskCreate, TaskUpdate
 from app.storage import read_tasks, save_tasks, generate_next_id
 
 
@@ -43,8 +43,31 @@ async def get_task(task_id: int):
     for task in tasks:                                              # Recorremos la lista buscando la tarea con el id pedido
         if task["id"] == task_id:                                   # Si encontramos una tarea cuyo id coincide con task_id, la devolvemos
             return task
+        
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,                      # Si el bucle termina sin encontrar ninguna coincidencia, lanzamos un error
+        detail=f"No existe ninguna tarea con id {task_id}")
+
+
+@router.patch("/tasks/{task_id}")
+async def update_task(task_update: TaskUpdate, task_id: int):                   # task_update es el body (campos opcionales); task_id viene de la URL
+    tasks = read_tasks()
+
+    for existing_task in tasks:
+        if existing_task["id"] == task_id:
+            if task_update.description is not None:                             # Solo actualizamos description si el usuario mandó un valor nuevo
+                existing_task["description"] = task_update.description
+
+            if task_update.status is not None:
+                existing_task["status"] = task_update.status
+
+            existing_task["updated_at"] = datetime.now().isoformat()            # updated_at siempre se actualiza, haya cambiado uno o ambos campos
+
+            save_tasks(tasks)
+            return existing_task
+        
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,                      
         detail=f"No existe ninguna tarea con id {task_id}")
 
 
