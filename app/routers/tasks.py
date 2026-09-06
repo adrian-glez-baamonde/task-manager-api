@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from datetime import datetime
 from app.schemas import TaskCreate
 from app.storage import read_tasks, save_tasks, generate_next_id
@@ -34,3 +34,17 @@ async def show_tasks(status: str | None = None):                                
         return filtered_tasks        
     else:                                                                       # Si no se pidió ningún filtro, devolvemos la lista completa de tareas
         return tasks
+
+
+@router.get("/tasks/{task_id}")
+async def get_task(task_id: int):
+    tasks = read_tasks()
+
+    for task in tasks:                                              # Recorremos la lista buscando la tarea con el id pedido
+        if task["id"] == task_id:                                   # Si encontramos una tarea cuyo id coincide con task_id, la devolvemos
+            return task
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,                      # Si el bucle termina sin encontrar ninguna coincidencia, lanzamos un error
+        detail=f"No existe ninguna tarea con id {task_id}")
+
+
