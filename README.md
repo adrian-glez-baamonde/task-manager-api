@@ -18,6 +18,7 @@ adaptado de una CLI a una API REST con FastAPI.
 - Python 3.14
 - FastAPI
 - Pydantic
+- pytest
 
 ## Instalación
 
@@ -48,6 +49,16 @@ adaptado de una CLI a una API REST con FastAPI.
    ```
    http://127.0.0.1:8000/docs
    ```
+
+## Tests
+
+El proyecto incluye tests automáticos con `pytest`, cubriendo los casos de éxito 
+y de error de todos los endpoints.
+
+Para ejecutarlos:
+```bash
+pytest
+```
 
 ## Endpoints
 
