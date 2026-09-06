@@ -71,3 +71,17 @@ async def update_task(task_update: TaskUpdate, task_id: int):                   
         detail=f"No existe ninguna tarea con id {task_id}")
 
 
+@router.delete("/tasks/{task_id}")
+async def delete_task(task_id: int):
+    tasks = read_tasks()
+
+    for index, existing_task in enumerate(tasks):                               # enumerate nos da el índice además del contenido, necesario para poder borrar con del                                 
+        if existing_task["id"] == task_id:                                   
+            del tasks[index]                                                    # La eliminamos de la lista usando su posición (índice)
+
+            save_tasks(tasks)
+            return existing_task
+        
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,                      
+        detail=f"No existe ninguna tarea con id {task_id}")
