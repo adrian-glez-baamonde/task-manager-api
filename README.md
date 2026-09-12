@@ -10,7 +10,7 @@ adaptado de una CLI a una API REST con FastAPI.
 
 - Crear, listar, ver, actualizar y borrar tareas.
 - Filtrar tareas por estado (`todo`, `in-progress`, `done`).
-- Persistencia en un archivo JSON local.
+- Persistencia en una base de datos SQLite.
 - Documentación interactiva automática con Swagger UI.
 
 ## Tecnologías
@@ -18,6 +18,8 @@ adaptado de una CLI a una API REST con FastAPI.
 - Python 3.14
 - FastAPI
 - Pydantic
+- SQLAlchemy
+- SQLite
 - pytest
 
 ## Instalación
@@ -50,6 +52,16 @@ adaptado de una CLI a una API REST con FastAPI.
    http://127.0.0.1:8000/docs
    ```
 
+## Endpoints
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/tasks` | Crear una tarea nueva |
+| GET | `/tasks` | Listar todas las tareas (admite `?status_filter=` para filtrar) |
+| GET | `/tasks/{task_id}` | Ver una tarea concreta |
+| PATCH | `/tasks/{task_id}` | Actualizar una tarea (parcial) |
+| DELETE | `/tasks/{task_id}` | Borrar una tarea |
+
 ## Tests
 
 El proyecto incluye tests automáticos con `pytest`, cubriendo los casos de éxito 
@@ -59,16 +71,6 @@ Para ejecutarlos:
 ```bash
 pytest
 ```
-
-## Endpoints
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| POST | `/tasks` | Crear una tarea nueva |
-| GET | `/tasks` | Listar todas las tareas (admite `?status=` para filtrar) |
-| GET | `/tasks/{task_id}` | Ver una tarea concreta |
-| PATCH | `/tasks/{task_id}` | Actualizar una tarea (parcial) |
-| DELETE | `/tasks/{task_id}` | Borrar una tarea |
 
 ## Nota sobre los comentarios
 
