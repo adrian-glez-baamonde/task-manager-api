@@ -12,7 +12,8 @@ router = APIRouter()
 async def create_task(task: TaskCreate, db: Session = Depends(get_db)):                 # db se obtiene automáticamente vía Depends(get_db) en cada petición
     new_task = Task(                                                                    # Creamos una instancia del modelo SQLAlchemy (no un diccionario)
         description=task.description,
-        status="todo"
+        status="todo",
+        category_id=task.category_id
     )                                                                                   # id, created_at y updated_at los genera la base de datos sola
 
     db.add(new_task)                                                                    # Marcamos el objeto para ser guardado
@@ -58,6 +59,9 @@ async def update_task(task_update: TaskUpdate, task_id: int, db: Session = Depen
 
     if task_update.status is not None:
         task.status = task_update.status
+
+    if task_update.category_id is not None:
+        task.category_id = task_update.category_id
 
     db.commit()                                                                         # updated_at se actualiza solo gracias a onupdate en el modelo
     db.refresh(task)
