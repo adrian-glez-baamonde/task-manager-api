@@ -4,3 +4,4 @@ __pycache__/
 .env
 tasks.json
 tasks.db
+test.db
