@@ -35,14 +35,20 @@ def test_get_all_tasks():
 
 
 def test_get_tasks_filtered_by_status():
-    response_create = client.post("/tasks", json={"description": "Tarea de prueba"})    # Creamos una tarea que sabemos que tendrá status "todo" por defecto
-    created_task = response_create.json()
+    response_task1 = client.post("/tasks", json={"description": "Tarea todo"})
+    task1 = response_task1.json()
 
-    response = client.get("/tasks?status=todo")                                         # Ahora filtramos por status "todo"
-    assert response.status_code == 200 
+    response_task2 = client.post("/tasks", json={"description": "Tarea todo 2"})
+    task2 = response_task2.json()
+    client.patch(f"/tasks/{task2['id']}", json={"status": "done"})
 
+    response = client.get("/tasks?status_filter=todo")
+    assert response.status_code == 200
     data = response.json()
-    assert any(task["id"] == created_task["id"] for task in data)                       # Comprobamos que la tarea que acabamos de crear está en esa lista filtrada
+
+    assert any(task["id"] == task1["id"] for task in data)
+
+    assert not any(task["id"] == task2["id"] for task in data)
 
 
 def test_get_tasks_by_id_success():
