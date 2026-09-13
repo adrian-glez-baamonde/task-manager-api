@@ -2,14 +2,20 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from app.schemas import TaskCreate, TaskUpdate, TaskResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import Task
+from app.models import Task, Category
 
 
 router = APIRouter()
 
 
-@router.post("/tasks", response_model=TaskResponse)                                     # response_model valida y da forma a la respuesta según TaskResponse
-async def create_task(task: TaskCreate, db: Session = Depends(get_db)):                 # db se obtiene automáticamente vía Depends(get_db) en cada petición
+@router.post("/tasks", response_model=TaskResponse)                                                                 # response_model valida y da forma a la respuesta según TaskResponse
+async def create_task(task: TaskCreate, db: Session = Depends(get_db)):                                             # db se obtiene automáticamente vía Depends(get_db) en cada petición
+
+    if task.category_id is not None and db.query(Category).filter(Category.id == task.category_id).first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"No existe ninguna categoría con id {task.category_id}")
+
     new_task = Task(                                                                    # Creamos una instancia del modelo SQLAlchemy (no un diccionario)
         description=task.description,
         status="todo",
@@ -47,6 +53,7 @@ async def get_task(task_id: int, db: Session = Depends(get_db)):
 
 @router.patch("/tasks/{task_id}", response_model=TaskResponse)
 async def update_task(task_update: TaskUpdate, task_id: int, db: Session = Depends(get_db)):
+
     task = db.query(Task).filter(Task.id == task_id).first()
 
     if task is None:
@@ -54,14 +61,16 @@ async def update_task(task_update: TaskUpdate, task_id: int, db: Session = Depen
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f"No existe ninguna tarea con id {task_id}")
 
+    if task_update.category_id is not None and db.query(Category).filter(Category.id == task_update.category_id).first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"No existe ninguna categoría con id {task_update.category_id}")
+
     if task_update.description is not None:
         task.description = task_update.description                                      # Asignación directa sobre el objeto, sin diccionarios
 
     if task_update.status is not None:
         task.status = task_update.status
-
-    if task_update.category_id is not None:
-        task.category_id = task_update.category_id
 
     db.commit()                                                                         # updated_at se actualiza solo gracias a onupdate en el modelo
     db.refresh(task)
