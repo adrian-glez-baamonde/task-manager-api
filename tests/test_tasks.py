@@ -23,6 +23,23 @@ def test_create_task_missing_description():
     assert response.status_code == 422
 
 
+def test_create_task_with_category():
+    response_category = client.post("/categories", json={"name": "Trabajo"})
+    category = response_category.json()
+
+    response_task = client.post("/tasks", json={"description": "Estudiar programación", "category_id": category["id"]})
+    assert response_task.status_code == 200
+    data = response_task.json()
+
+    assert data["description"] == "Estudiar programación"
+    assert data["status"] == "todo"
+    assert data["category_id"] == category["id"]
+
+    assert "id" in data
+    assert "created_at" in data
+    assert "updated_at" in data
+
+
 def test_get_all_tasks():
     response_create = client.post("/tasks", json={"description": "Tarea de prueba"})    
     created_task = response_create.json()
