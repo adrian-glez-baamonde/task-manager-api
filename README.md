@@ -10,7 +10,8 @@ adaptado de una CLI a una API REST con FastAPI.
 
 - Crear, listar, ver, actualizar y borrar tareas.
 - Filtrar tareas por estado (`todo`, `in-progress`, `done`).
-- Persistencia en un archivo JSON local.
+- Organizar tareas en categorías (crear y listar categorías, asignar categoría a una tarea).
+- Persistencia en base de datos SQLite mediante SQLAlchemy.
 - Documentación interactiva automática con Swagger UI.
 
 ## Tecnologías
@@ -18,6 +19,8 @@ adaptado de una CLI a una API REST con FastAPI.
 - Python 3.14
 - FastAPI
 - Pydantic
+- SQLAlchemy
+- SQLite
 - pytest
 
 ## Instalación
@@ -62,13 +65,22 @@ pytest
 
 ## Endpoints
 
+### Tareas
+
 | Método | Ruta | Descripción |
 |---|---|---|
-| POST | `/tasks` | Crear una tarea nueva |
-| GET | `/tasks` | Listar todas las tareas (admite `?status=` para filtrar) |
+| POST | `/tasks` | Crear una tarea nueva (admite `category_id` opcional) |
+| GET | `/tasks` | Listar todas las tareas (admite `?status_filter=` para filtrar por estado) |
 | GET | `/tasks/{task_id}` | Ver una tarea concreta |
-| PATCH | `/tasks/{task_id}` | Actualizar una tarea (parcial) |
+| PATCH | `/tasks/{task_id}` | Actualizar una tarea (parcial, incluye reasignar `category_id`) |
 | DELETE | `/tasks/{task_id}` | Borrar una tarea |
+
+### Categorías
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/categories` | Crear una categoría nueva |
+| GET | `/categories` | Listar todas las categorías |
 
 ## Nota sobre los comentarios
 
